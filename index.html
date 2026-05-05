@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pulse — India News</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Background texture -->
+  <div class="bg-grain"></div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="header-left">
+        <span class="header-tag">LIVE</span>
+        <span class="header-date" id="live-date"></span>
+      </div>
+      <div class="header-logo">
+        <span class="logo-pulse">PULSE</span>
+        <span class="logo-sub">India</span>
+      </div>
+      <div class="header-right">
+        <button class="refresh-btn" id="refresh-btn" title="Refresh news">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="header-rule"></div>
+  </header>
+
+  <!-- Hero section -->
+  <div class="hero-section">
+    <div class="hero-eyebrow">Top Headlines</div>
+    <h1 class="hero-title">What's Happening<br><em>Right Now</em></h1>
+  </div>
+
+  <!-- News grid -->
+  <main class="news-container" id="news-container">
+
+    <!-- Skeleton loaders -->
+    <div class="skeleton-grid" id="skeleton">
+      <div class="skeleton-card skeleton-featured"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+    </div>
+
+    <!-- Error state (hidden by default) -->
+    <div class="error-state" id="error-state" style="display:none;">
+      <div class="error-icon">✦</div>
+      <p class="error-msg">Could not load headlines. Check your connection or API key.</p>
+      <button class="retry-btn" id="retry-btn">Try Again</button>
+    </div>
+
+    <!-- Cards will be injected here -->
+    <div class="cards-grid" id="cards-grid" style="display:none;"></div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>Powered by NewsAPI</span>
+      <span class="footer-dot">·</span>
+      <span id="last-updated"></span>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
