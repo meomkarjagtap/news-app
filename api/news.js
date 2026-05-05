@@ -3,42 +3,36 @@ export default async function handler(req, res) {
   res.setHeader('Pragma', 'no-cache');
 
   try {
-    const NEWS_API_KEY  = process.env.NEWS_API_KEY;
-    const GNEWS_API_KEY = process.env.GNEWS_API_KEY;
+    const CURRENTS_KEY = process.env.CURRENTS_API_KEY;
+    const NEWS_API_KEY = process.env.NEWS_API_KEY;
 
-    // ── Try GNews first (works on deployed domains, free tier) ──
-    if (GNEWS_API_KEY) {
-      // Try with country filter first, then fall back to lang-only
-      const urls = [
-        `https://gnews.io/api/v4/top-headlines?lang=en&country=in&max=10&apikey=${GNEWS_API_KEY}&q=india`,
-        `https://gnews.io/api/v4/top-headlines?lang=en&max=10&topic=breaking-news&apikey=${GNEWS_API_KEY}&q=india`,
-      ];
+    // ── Currents API (free, works on deployed domains, India support) ──
+    if (CURRENTS_KEY) {
+      const cRes  = await fetch(
+        `https://api.currentsapi.services/v1/latest-news?language=en&country=IN&apiKey=${CURRENTS_KEY}`
+      );
+      const cData = await cRes.json();
 
-      for (const url of urls) {
-        const gRes  = await fetch(url);
-        const gData = await gRes.json();
-
-        if (gData.articles?.length) {
-          return res.status(200).json({
-            status: 'ok',
-            totalResults: gData.totalArticles,
-            articles: gData.articles.map(a => ({
-              source:      { name: a.source?.name || 'Unknown' },
-              title:       a.title,
-              description: a.description,
-              url:         a.url,
-              urlToImage:  a.image,
-              publishedAt: a.publishedAt,
-            }))
-          });
-        }
+      if (cData.news?.length) {
+        return res.status(200).json({
+          status: 'ok',
+          totalResults: cData.news.length,
+          articles: cData.news.slice(0, 10).map(a => ({
+            source:      { name: a.author || 'Unknown' },
+            title:       a.title,
+            description: a.description,
+            url:         a.url,
+            urlToImage:  a.image !== 'None' ? a.image : null,
+            publishedAt: a.published,
+          }))
+        });
       }
     }
 
-    // ── Fallback: NewsAPI (works on localhost dev only) ──
+    // ── Fallback: NewsAPI (localhost dev only) ──
     if (!NEWS_API_KEY) {
       return res.status(500).json({
-        error: 'No API key configured. Set GNEWS_API_KEY (recommended) or NEWS_API_KEY.'
+        error: 'No API key configured. Set CURRENTS_API_KEY in Vercel env vars.'
       });
     }
 
