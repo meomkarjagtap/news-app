@@ -8,25 +8,30 @@ export default async function handler(req, res) {
 
     // ── Try GNews first (works on deployed domains, free tier) ──
     if (GNEWS_API_KEY) {
-      const gRes  = await fetch(
-        `https://gnews.io/api/v4/top-headlines?country=in&max=10&apikey=${GNEWS_API_KEY}`
-      );
-      const gData = await gRes.json();
+      // Try with country filter first, then fall back to lang-only
+      const urls = [
+        `https://gnews.io/api/v4/top-headlines?lang=en&country=in&max=10&apikey=${GNEWS_API_KEY}&q=india`,
+        `https://gnews.io/api/v4/top-headlines?lang=en&max=10&topic=breaking-news&apikey=${GNEWS_API_KEY}&q=india`,
+      ];
 
-      if (gData.articles?.length) {
-        // Normalize to NewsAPI shape so frontend needs no changes
-        return res.status(200).json({
-          status: 'ok',
-          totalResults: gData.totalArticles,
-          articles: gData.articles.map(a => ({
-            source:      { name: a.source?.name || 'Unknown' },
-            title:       a.title,
-            description: a.description,
-            url:         a.url,
-            urlToImage:  a.image,
-            publishedAt: a.publishedAt,
-          }))
-        });
+      for (const url of urls) {
+        const gRes  = await fetch(url);
+        const gData = await gRes.json();
+
+        if (gData.articles?.length) {
+          return res.status(200).json({
+            status: 'ok',
+            totalResults: gData.totalArticles,
+            articles: gData.articles.map(a => ({
+              source:      { name: a.source?.name || 'Unknown' },
+              title:       a.title,
+              description: a.description,
+              url:         a.url,
+              urlToImage:  a.image,
+              publishedAt: a.publishedAt,
+            }))
+          });
+        }
       }
     }
 
